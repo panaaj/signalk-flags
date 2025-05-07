@@ -1,7 +1,7 @@
 // **** Signal K flags resources ****
-import { NextFunction, Router, Application, Request, Response } from 'express'
-import { constants, Dirent } from 'fs'
-import { access, readdir } from 'fs/promises'
+import { Application, Request, Response } from 'express'
+import { constants } from 'fs'
+import { access } from 'fs/promises'
 import path from 'path'
 
 import {
@@ -61,7 +61,7 @@ module.exports = (server: FlagsApp): Plugin => {
       server.debug(`Required for OpenApi support.`)
       return router
     },
-    getOpenApi: () => openapi
+    getOpenApi: () => Object.assign({}, openapi)
   }
 
   let settings: any = {}
@@ -134,9 +134,6 @@ module.exports = (server: FlagsApp): Plugin => {
           return
         }
         const context = delta.context
-        /*server.debug(
-          `${JSON.stringify(delta)}`
-        )*/
         delta.updates.forEach((u: Update) => {
           if (!hasValues(u)) {
             return
@@ -176,7 +173,8 @@ module.exports = (server: FlagsApp): Plugin => {
   const initFs = async () => {
     const p = path.resolve(server.getDataDirPath()).split('/')
     const sp = p.slice(0, p.indexOf('.signalk') + 1).join('/')
-    IMG_BASE_PATH = path.join(
+    // dev env
+    const DEV_PATH = path.join(
       sp,
       'node_modules',
       plugin.id,
@@ -184,15 +182,23 @@ module.exports = (server: FlagsApp): Plugin => {
       'flag-icons',
       'flags'
     )
+    // prod env
+    const PRD_PATH = path.join(sp, 'node_modules', 'flag-icons', 'flags')
+
     try {
-      await access(
-        // check path exists
-        IMG_BASE_PATH,
-        constants.W_OK | constants.R_OK
-      )
-      server.debug(`${IMG_BASE_PATH} - OK...Flag images found.`)
+      await access(PRD_PATH, constants.W_OK | constants.R_OK)
+      server.debug(`${PRD_PATH} - OK...Flag images found.`)
+      IMG_BASE_PATH = PRD_PATH
     } catch (error) {
-      server.debug(`${IMG_BASE_PATH} does NOT exist!`)
+      server.debug(`${PRD_PATH} does NOT exist!`)
+      server.debug(`Trying secondary path....${DEV_PATH}`)
+      try {
+        await access(DEV_PATH, constants.W_OK | constants.R_OK)
+        server.debug(`${DEV_PATH} - OK...Flag images found.`)
+        IMG_BASE_PATH = DEV_PATH
+      } catch (error) {
+        server.debug(`${DEV_PATH} does NOT exist either!`)
+      }
     }
   }
 
