@@ -8,11 +8,6 @@
     ],
     "repository": "https://github.com/panaaj/signalk-flags",
     "author": "AdrianP",
-    "contributors": [
-        {
-            "name": "panaaj@hotmail.com"
-        }
-    ],
     "license": "Apache-20",
     "scripts": {
         "build": "tsc",
