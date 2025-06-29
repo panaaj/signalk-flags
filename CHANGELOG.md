@@ -1,7 +1,11 @@
 # CHANGELOG: Signal K Flag Resources - Signal K plugin 
 
-## v1.0.0-beta.1
+## v1.0.1
 
-- Initial beta release.
+- **Fix**: Issue where test for MMSI throwing errors.
+
+## v1.0.0
+
+- Initial release.
 
 

@@ -139,7 +139,7 @@ module.exports = (server: FlagsApp): Plugin => {
             return
           }
           u.values.forEach((v: PathValue) => {
-            if (v.path === '' && 'mmsi' in (v.value as object)) {
+            if (v.path === '' && v.value && 'mmsi' in (v.value as object)) {
               const country = countryFromMmsi((v.value as any).mmsi)
               if (country) {
                 server.handleMessage(plugin.id, {

@@ -1,6 +1,6 @@
 {
     "name": "signalk-flags",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Country Flags plugin for Signal K server.",
     "main": "plugin/index.js",
     "keywords": [
