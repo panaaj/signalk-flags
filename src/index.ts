@@ -5,34 +5,23 @@ import { access } from 'fs/promises'
 import path from 'path'
 
 import {
+  Context,
   Delta,
+  Path,
   PathValue,
   Plugin,
   ServerAPI,
+  SubscribeMessage,
   Update,
-  hasValues
+  hasValues,
+  getFlagCountry,
+  FlagCountry
 } from '@signalk/server-api'
 import * as openapi from './openApi.json'
 
-import { MID } from './mid'
-
 type FlagAspect = '1x1' | '4x3'
 
-interface SKDeltaSubscription {
-  context: string
-  subscribe: Array<{ path: string; period: number }>
-}
-
-export interface FlagsApp extends ServerAPI, Application {
-  subscriptionmanager: {
-    subscribe: (
-      subscribe: SKDeltaSubscription,
-      unsubscribes: Array<any>,
-      errorCallback: (error: any) => void,
-      deltaCallback: (delta: Delta) => void
-    ) => void
-  }
-}
+export interface FlagsApp extends ServerAPI, Application {}
 
 const CONFIG_SCHEMA = {
   properties: {}
@@ -113,11 +102,11 @@ module.exports = (server: FlagsApp): Plugin => {
   const initSubscriptions = () => {
     server.debug('Initialising Stream Subscription....')
 
-    const subscription: SKDeltaSubscription = {
-      context: 'vessels.*',
+    const subscription: SubscribeMessage = {
+      context: 'vessels.*' as Context,
       subscribe: [
         {
-          path: '',
+          path: '' as Path,
           period: 500
         }
       ]
@@ -148,12 +137,12 @@ module.exports = (server: FlagsApp): Plugin => {
                     {
                       values: [
                         {
-                          path: 'flag',
-                          value: country[0]
+                          path: 'flag' as Path,
+                          value: country.alpha2
                         },
                         {
-                          path: 'port',
-                          value: country[3]
+                          path: 'port' as Path,
+                          value: country.name
                         }
                       ]
                     }
@@ -274,7 +263,7 @@ module.exports = (server: FlagsApp): Plugin => {
   ) => {
     try {
       const country = countryFromMmsi(mmsi)
-      const flag = `${IMG_BASE_PATH}/${aspect}/${country[0].toLowerCase()}.svg`
+      const flag = `${IMG_BASE_PATH}/${aspect}/${country?.alpha2.toLowerCase()}.svg`
       // check flag file exists
       await access(flag, constants.R_OK)
       res.sendFile(flag, (err) => {
@@ -299,14 +288,10 @@ module.exports = (server: FlagsApp): Plugin => {
   /**
    * Get country details from supplied MMSI
    * @param mmsi Maritime mobile service identifier
-   * @returns Array containing country details
+   * @returns Object containing country details
    */
-  const countryFromMmsi = (mmsi: number | string): string[] => {
-    if (typeof mmsi === 'number') {
-      mmsi = mmsi.toString()
-    }
-    const mid = mmsi.slice(0, 3)
-    return MID[mid]
+  const countryFromMmsi = (mmsi: string): FlagCountry | null => {
+    return getFlagCountry(mmsi)
   }
 
   return plugin
