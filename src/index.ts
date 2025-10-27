@@ -129,25 +129,29 @@ module.exports = (server: FlagsApp): Plugin => {
           }
           u.values.forEach((v: PathValue) => {
             if (v.path === '' && v.value && 'mmsi' in (v.value as object)) {
-              const country = countryFromMmsi((v.value as any).mmsi)
-              if (country) {
-                server.handleMessage(plugin.id, {
-                  context: context,
-                  updates: [
-                    {
-                      values: [
-                        {
-                          path: 'flag' as Path,
-                          value: country.alpha2
-                        },
-                        {
-                          path: 'port' as Path,
-                          value: country.name
-                        }
-                      ]
-                    }
-                  ]
-                })
+              // if doesn't already have flag property
+              const vf = server.getPath(`${context}.flag`)
+              if (!vf) {
+                const country = countryFromMmsi((v.value as any).mmsi)
+                if (country) {
+                  server.handleMessage(plugin.id, {
+                    context: context,
+                    updates: [
+                      {
+                        values: [
+                          {
+                            path: 'flag' as Path,
+                            value: country.alpha2
+                          },
+                          {
+                            path: 'port' as Path,
+                            value: country.name
+                          }
+                        ]
+                      }
+                    ]
+                  })
+                }
               }
             }
           })
