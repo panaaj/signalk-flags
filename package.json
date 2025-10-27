@@ -15,7 +15,8 @@
         "watch": "npm run build -- -w",
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "npm run build -- -w",
-        "format": "prettier --write src/*"
+        "format": "prettier --write src/*",
+        "prepublishOnly": "tsc"
     },
     "dependencies": {
         "@signalk/server-api": "^2.9.0",
