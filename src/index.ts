@@ -144,7 +144,7 @@ module.exports = (server: FlagsApp): Plugin => {
                             value: country.alpha2
                           },
                           {
-                            path: 'port' as Path,
+                            path: 'country' as Path,
                             value: country.name
                           }
                         ]
@@ -205,7 +205,11 @@ module.exports = (server: FlagsApp): Plugin => {
       `${FLAGS_API_PATH}/mmsi/:mmsi`,
       (req: Request, res: Response) => {
         server.debug(`** ${req.method} ${req.path}`)
-        iconFromMmsi(req.params.mmsi, req.query.aspect as FlagAspect, res)
+        iconFromMmsi(
+          req.params.mmsi as string,
+          req.query.aspect as FlagAspect,
+          res
+        )
       }
     )
 
@@ -214,7 +218,7 @@ module.exports = (server: FlagsApp): Plugin => {
       (req: Request, res: Response) => {
         server.debug(`** ${req.method} ${req.path}`)
         iconFromCountryCode(
-          req.params.code,
+          req.params.code as string,
           req.query.aspect as FlagAspect,
           res
         )
