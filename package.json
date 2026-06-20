@@ -19,17 +19,17 @@
         "build": "tsc",
         "build-declaration": "tsc --declaration --allowJs false",
         "watch": "npm run build -- -w",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "mocha",
         "start": "npm run build -- -w",
         "format": "prettier --write src/*",
-        "prepublishOnly": "tsc"
+        "prepublishOnly": "tsc",
+        "prepack": "tsc"
     },
     "dependencies": {
-        "@signalk/server-api": "2.9",
+        "@signalk/server-api": "^2.28.0",
         "flag-icons": "^7.3.2"
     },
     "devDependencies": {
-        "@types/baconjs": "^0.7.34",
         "@types/express": "^5.0.6",
         "prettier": "^3.8.4",
         "typescript": "^6.0.3"
