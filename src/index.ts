@@ -128,7 +128,12 @@ module.exports = (server: FlagsApp): Plugin => {
             return
           }
           u.values.forEach((v: PathValue) => {
-            if (v.path === '' && v.value && 'mmsi' in (v.value as object)) {
+            if (
+              v.path === '' &&
+              v.value !== null &&
+              typeof v.value === 'object' &&
+              'mmsi' in v.value
+            ) {
               // if doesn't already have flag property
               const vf = server.getPath(`${context}.flag`)
               if (!vf) {
